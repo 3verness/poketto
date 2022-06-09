@@ -31,7 +31,7 @@ func (ep *Episode) TryParse() {
 }
 
 func (ep *Episode) ToFields() []string {
-	return []string{ep.TitleRaw, ep.Name, fmt.Sprint(ep.Season), fmt.Sprint(ep.Ep), ep.Group, ep.Dpi, ep.Sub, ep.Source, ep.ParseErr.Error()}
+	return []string{ep.TitleRaw, ep.Name, fmt.Sprint(ep.Season), fmt.Sprint(ep.Ep), ep.Group, ep.Dpi, ep.Sub, ep.Source}
 }
 
 func (ep *Episode) parse() error {
@@ -40,8 +40,14 @@ func (ep *Episode) parse() error {
 		return errors.New("原始标题为空，无法解析。")
 	}
 	raw = strings.NewReplacer("【", "[", "】", "]").Replace(raw)
-	group := regexp.MustCompile(`[\[\]]`).Split(raw, -1)[1]
+	var group string
+	if regexp.MustCompile(`[\[\]]`).MatchString(raw) {
+		group = regexp.MustCompile(`[\[\]]`).Split(raw, -1)[1]
+	}
 	matcher := regexp.MustCompile(`(.*|\[.*])( -? \d{1,3} |\[\d{1,3}]|\[\d{1,3}.?[vV]\d{1}]|[第第]\d{1,3}[话話集集]|\[\d{1,3}.?END])(.*)`).FindStringSubmatch(raw)
+	if matcher == nil {
+		return errors.New("无法解析")
+	}
 	name, season, err := getSeason(matcher[1])
 	if err != nil {
 		return errors.New("无法解析季数")
@@ -136,7 +142,7 @@ func getName(raw string) (name string, err error) {
 	}
 	if len(slices) == 1 {
 		matcher := regexp.MustCompile(`([^\x00-\xff]{1,})(\s)([\x00-\xff]{4,})`).FindStringSubmatch(raw)
-		if matcher[3] != "" {
+		if matcher != nil && matcher[3] != "" {
 			return matcher[3], nil
 		}
 	}

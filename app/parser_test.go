@@ -2,21 +2,38 @@ package app
 
 import (
 	"bufio"
-	"fmt"
-	"strings"
+	"encoding/csv"
+	"os"
 	"testing"
 )
 
-var rawList = `[NC-Raws] 小書痴的下剋上：為了成為圖書管理員不擇手段！第三季 / Honzuki no Gekokujou S3 - 33 (Baha 1920x1080 AVC AAC MP4)
-[NC-Raws] 小书痴的下克上：为了成为图书管理员不择手段！第三季 / Honzuki no Gekokujou S3 - 33 (B-Global 1920x1080 HEVC AAC MKV)`
+var rawList = ``
 
 func TestParser(t *testing.T) {
+	fr, err := os.Open("D:\\Code\\poketto\\data\\test_data.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer fr.Close()
+	sc := bufio.NewScanner(fr)
+
 	var eps []*Episode
-	sc := bufio.NewScanner(strings.NewReader(rawList))
 	for sc.Scan() {
 		ep := NewEpisode(sc.Text())
 		ep.TryParse()
 		eps = append(eps, ep)
-		fmt.Printf("%+v\n", ep)
 	}
+
+	fw, err := os.Create("D:\\Code\\poketto\\data\\test_out.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer fw.Close()
+	w := csv.NewWriter(fw)
+	for _, ep := range eps {
+		if err := w.Write(ep.ToFields()); err != nil {
+			panic(err)
+		}
+	}
+	w.Flush()
 }
