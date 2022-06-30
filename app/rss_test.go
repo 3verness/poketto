@@ -8,5 +8,9 @@ func TestRSS(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	t.Log(f.Title)
+	for _, item := range f.Items {
+		for _, enclosure := range item.Enclosures {
+			t.Log(enclosure.URL)
+		}
+	}
 }
