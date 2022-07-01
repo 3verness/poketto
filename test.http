@@ -1,0 +1,14 @@
+POST /api/v2/torrents/info HTTP/1.1
+Host: 127.0.0.1:8080
+Cookie: SID=7Ls4Qn+XPPPcW9OFNrRkM65vdKJGQ6CK
+Content-Type: application/x-www-form-urlencoded
+
+category=Poketto Managed&sort=added_on&reverse=true
+
+###
+POST /api/v2/torrents/files HTTP/1.1
+Host: 127.0.0.1:8080
+Cookie: SID=7Ls4Qn+XPPPcW9OFNrRkM65vdKJGQ6CK
+Content-Type: application/x-www-form-urlencoded
+
+hash=eb79dcd941845eaf3430a7d129fed5fd9b1e8dd7
